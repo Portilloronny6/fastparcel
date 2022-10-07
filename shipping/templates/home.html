@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  {% load bootstrap4 %}
+  {% bootstrap_css %}
+  {% bootstrap_javascript jquery=True %}
+  <!-- Our project just needs Font Awesome Free's Solid and Brand files -->
+  <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-warning">
+  <a class="navbar-brand" href="#">Fast Parcel</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Customer<span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Courier</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="row">
+    <div class="col-lg-12">
+      <h1 class="text-center mt-5 mb-5">
+        Welcome to FastParcel <i class="fa-regular fa-dolly text-warning"></i>
+      </h1>
+    </div>
+
+    <div class="col-lg-6 mt-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Customer</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+            content.</p>
+          <a href="/customer/" class="btn btn-warning">Detail</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 mt-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title"><i class="fa-regular fa-dolly"></i> Courier</h5>
+          <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's
+            content.</p>
+          <a href="/courier/" class="btn btn-warning">Detail</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="text-center mt-5 mb-5">
+  p © 2022 Fast Parcel. All rights reserved.
+</footer>
+
+</body>
+</html>
