@@ -1,0 +1,22 @@
+{% extends 'customers/base_portal.html' %}
+{% load bootstrap4 %}
+
+{% block title %}
+  {{ user.get_full_name|title }}
+{% endblock %}
+
+{% block main %}
+  <b class="text-secondary">Basic Information</b>
+  <br>
+  <div class="card bg-white mt-2 mb-5">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form user_form %}
+        {% bootstrap_form customer_form %}
+        <input type="hidden" name="action" value="update_profile">
+        <button type="submit" class="btn btn-warning">Save</button>
+      </form>
+    </div>
+  </div>
+{% endblock %}

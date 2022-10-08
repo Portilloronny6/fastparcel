@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
+  <title>{% block title %}{% endblock %}</title>
+  {% load bootstrap4 %}
+  {% bootstrap_css %}
+  {% bootstrap_javascript jquery=True %}
+  <!-- Our project just needs Font Awesome Free's Solid and Brand files -->
+  <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+  {% block head %}{% endblock %}
+</head>
+<body>
+<nav class="navbar {% if not user.is_authenticated %}navbar-expand-lg{% endif %}  navbar-light bg-warning">
+  <a class="navbar-brand" href="{% url 'home' %}">FastParcel</a>
+  {% if not user.is_authenticated %}
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item {% if request.GET.next != '/courier/' %}active{% endif %}">
+          <a class="nav-link" href="{% url 'customer_page' %}">Customer<span
+              class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item {% if request.GET.next == '/courier/' %}active{% endif %}">
+          <a class="nav-link" href="{% url 'courier_page' %}">Courier</a>
+        </li>
+      </ul>
+    </div>
+  {% else %}
+    <form class="form-inline">
+    <span class="mr-4">
+      {{ user.get_full_name|title }}
+    </span>
+      <a href="/sign-out/" class="btn btn-outline-dark">Sign Out</a>
+
+    </form>
+  {% endif %}
+
+</nav>
+
+{% block content %}
+
+{% endblock %}
+
+<footer class="text-center mt-5 mb-5">
+  p © 2022 Fast Parcel. All rights reserved.
+</footer>
+
+</body>
+</html>
