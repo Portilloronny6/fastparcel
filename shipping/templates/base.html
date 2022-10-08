@@ -55,5 +55,16 @@
   p © 2022 Fast Parcel. All rights reserved.
 </footer>
 
+<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{% static 'js/fastparcel.js' %}"></script>
+<script>
+    {% if messages %}
+        {% for message in messages %}
+            console.log("{{ message }}");
+            messageAlert('{{ message }}', '{{ message.tags }}');
+        {% endfor %}
+    {% endif %}
+</script>
+
 </body>
 </html>

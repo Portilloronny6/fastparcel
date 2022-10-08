@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth import login
 from django.shortcuts import render, redirect
 from django.views import View
@@ -25,6 +26,7 @@ class SignUpView(View):
             user.username = email
             user.save()
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+            messages.success(request, 'Your account has been created! 😁')
             redirect('sign_in')
         return render(request, 'home.html', context)
 

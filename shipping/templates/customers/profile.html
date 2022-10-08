@@ -1,22 +1,70 @@
 {% extends 'customers/base_portal.html' %}
+{% load static %}
 {% load bootstrap4 %}
+
+{% block head %}
+  <script src="{% static 'js/firebase.js' %}" type="module"></script>
+{% endblock %}
 
 {% block title %}
   {{ user.get_full_name|title }}
 {% endblock %}
 
 {% block main %}
+  <hr>
+  {#  Basic Information #}
   <b class="text-secondary">Basic Information</b>
-  <br>
   <div class="card bg-white mt-2 mb-5">
     <div class="card-body">
       <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% bootstrap_form user_form %}
         {% bootstrap_form customer_form %}
-        <input type="hidden" name="action" value="update_profile">
+        <input type="hidden" name="basic_form" value="update_profile">
         <button type="submit" class="btn btn-warning">Save</button>
       </form>
     </div>
   </div>
+  <hr>
+  {#  Reset Password #}
+  <b class="text-secondary">Reset Password</b>
+  <div class="card bg-white mt-2 mb-5">
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% bootstrap_form password_form %}
+        <input type="hidden" name="reset_form" value="update_password">
+        <button type="submit" class="btn btn-warning">Save</button>
+      </form>
+    </div>
+  </div>
+  <hr>
+  {# Phone Verification #}
+  <b class="text-secondary">Phone Number</b>
+  <div class="card bg-white mt-2 mb-5">
+    <div class="card-body">
+
+
+      <div id="get-code" class="input-group mb-3">
+        <input type="text" class="form-control" placeholder="Your phone number">
+        <div class="input-group-append">
+          <button class="btn btn-warning">Send code</button>
+        </div>
+      </div>
+
+      <div id="verify-code" class="input-group mb-3 d-none">
+        <input type="text" class="form-control" placeholder="Verification code">
+        <div class="input-group-append">
+          <button class="btn btn-warning">Send code</button>
+        </div>
+      </div>
+
+      <div id="recaptcha-container"></div>
+
+    </div>
+  </div>
+
+
+  <script src="{% static 'js/phone-auth.js' %}" type="module"></script>
+
 {% endblock %}
