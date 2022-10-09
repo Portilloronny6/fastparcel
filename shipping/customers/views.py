@@ -1,3 +1,5 @@
+import firebase_admin
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -5,8 +7,12 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views import View
+from firebase_admin import credentials, auth
 
 from shipping.forms import BasicUserForm, BasicCustomerForm
+
+cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS)
+firebase_admin.initialize_app(cred)
 
 
 class CustomerPageView(LoginRequiredMixin, View):
@@ -46,6 +52,16 @@ class ProfilePage(LoginRequiredMixin, View):
             update_session_auth_hash(request, password_form.user)
             messages.success(request, 'Your password has been updated.')
             return redirect(reverse('profile_page'))
+
+        if request.POST.get('phone_check'):
+            try:
+                firebase_user = auth.verify_id_token(request.POST.get('id_token', ''))
+                request.user.customer.phone_number = firebase_user.get('phone_number', '')
+                request.user.customer.save()
+                return redirect(reverse('profile_page'))
+            except:
+                messages.error(request, 'A problem has occurred')
+                return redirect(reverse('profile_page'))
 
         context = {
             'user_form': BasicUserForm(instance=request.user),

@@ -45,8 +45,8 @@
     <div class="card-body">
 
 
-      <div id="get-code" class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Your phone number">
+      <div id="get-code" class="input-group mb-3 {% if user.customer.phone_number %} d-none {% endif %}">
+        <input type="text" class="form-control" placeholder="+56123456789">
         <div class="input-group-append">
           <button class="btn btn-warning">Send code</button>
         </div>
@@ -55,7 +55,16 @@
       <div id="verify-code" class="input-group mb-3 d-none">
         <input type="text" class="form-control" placeholder="Verification code">
         <div class="input-group-append">
+          {% csrf_token %}
           <button class="btn btn-warning">Send code</button>
+        </div>
+      </div>
+
+      <div id="change-phone" class="input-group mb-3 {% if not user.customer.phone_number %}d-none{% endif %} ">
+        <input type="text" class="form-control" disabled
+               value="{{ user.customer.phone_number }}">
+        <div class="input-group-append">
+          <button class="btn btn-warning">Change</button>
         </div>
       </div>
 

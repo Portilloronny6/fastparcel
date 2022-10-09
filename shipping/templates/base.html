@@ -56,11 +56,11 @@
 </footer>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="{% static 'js/fastparcel.js' %}"></script>
-<script>
+<script src="{% static 'js/helpers.js' %}" type="module"></script>
+<script type="module">
+    import {messageAlert} from "{% static 'js/helpers.js' %}";
     {% if messages %}
         {% for message in messages %}
-            console.log("{{ message }}");
             messageAlert('{{ message }}', '{{ message.tags }}');
         {% endfor %}
     {% endif %}
