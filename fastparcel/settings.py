@@ -135,3 +135,8 @@ DEFAULT_FROM_EMAIL = 'Fast Parcel <no-reply@fastparcel.localhost>'
 # Firease
 
 FIREBASE_CREDENTIALS = BASE_DIR / 'fastparcel-970e6-firebase-adminsdk-7n8z4-91bf602120.json'
+
+# Stripe
+
+STRIPE_API_PUBLIC_KEY = 'pk_test_51LqzbFAoF7K2KEW3ziuCQ2O95X25TD9nYbps2RQ1tAnHpa3fYLcj4uzwqQn6EIr3dGoOfjnDSZby3AEz0OklMnew002FjBEZ2i'
+STRIPE_API_SECRET_KEY = 'sk_test_51LqzbFAoF7K2KEW3KD2ZxMpU5Jxb8MK3yGSDFtUkWpPv4AnACbdiwk8SAIE35yhFCEm0ChcOhRC8SY3j8cSjzzkf00eMh55KzY'
