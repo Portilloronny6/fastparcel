@@ -1,12 +1,67 @@
 {% extends 'customers/base_portal.html' %}
-
+{% load static %}
 {% load bootstrap4 %}
 
+{% block title %}
+  Payment Method
+{% endblock %}
+
+{% block head %}
+  <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}
+
 {% block main %}
+
+  {% if not user.customer.stripe_payment_method_id %}
+    <div class="alert alert-danger alert-dismissible fade show">
+      Add your Credit or Debit Card to <strong>Create a Job</strong>!
+      <button class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endif %}
+
   <b class="text-secondary">Your Credit/Debit Card</b>
   <div class="card bg-white mt-2 mb-5">
     <div class="card-body">
-      
+
+      {% if user.customer.stripe_payment_method_id %}
+
+        <div class="input-group" id="change-card">
+          <input type="text" class="form-control" disabled value="**** **** **** {{ user.customer.stripe_card_last4 }}">
+          <div class="input-group-append">
+            <form method="post">
+              {% csrf_token %}
+              <button class="btn btn-danger" type="submit">Remove card</button>
+            </form>
+          </div>
+        </div>
+
+
+      {% else %}
+
+        <form id="payment-form">
+          <div id="payment-element">
+            <!-- Elements will create form elements here -->
+          </div>
+          <button id="submit" class="btn btn-warning mt-3">Submit</button>
+          <div id="error-message">
+            <!-- Display error message to your customers here -->
+          </div>
+        </form>
+
+      {% endif %}
     </div>
   </div>
+
+  {% if not user.customer.stripe_payment_method_id %}
+    <script>
+        const context = {
+            stripeApiPublicKey: "{{ STRIPE_API_PUBLIC_KEY|safe }}",
+            clientSecret: "{{ client_secret|safe }}"
+        }
+    </script>
+    <script src="{% static "js/stripe.js" %}" type="module"></script>
+  {% endif %}
+
 {% endblock %}

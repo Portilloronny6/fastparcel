@@ -3,3 +3,4 @@ django-bootstrap4==22.2
 fontawesomefree==6.2.0
 pillow==9.2.0
 firebase-admin==6.0.0
+stripe==4.2.0

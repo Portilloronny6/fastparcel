@@ -1,8 +1,8 @@
 import firebase_admin
+import stripe
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse
@@ -14,12 +14,7 @@ from shipping.forms import BasicUserForm, BasicCustomerForm, CustomPasswordReset
 cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS)
 firebase_admin.initialize_app(cred)
 
-
-class CustomerPageView(LoginRequiredMixin, View):
-    login_url = '/sign-in/?next=/customer/'
-
-    def get(self, request):
-        return redirect(reverse('profile_page'))
+stripe.api_key = settings.STRIPE_API_SECRET_KEY
 
 
 class ProfilePage(LoginRequiredMixin, View):
@@ -45,14 +40,14 @@ class ProfilePage(LoginRequiredMixin, View):
             user_form.save()
             customer_form.save()
             messages.success(request, 'Your profile has been updated.')
-            return redirect(reverse('profile_page'))
+            return redirect(reverse('customer:profile_page'))
 
         password_form = CustomPasswordResetForm(request.user, request.POST)
         if request.POST.get('reset_form') and password_form.is_valid():
             password_form.save()
             update_session_auth_hash(request, password_form.user)
             messages.success(request, 'Your password has been updated.')
-            return redirect(reverse('profile_page'))
+            return redirect(reverse('customer:profile_page'))
 
         if request.POST.get('phone_check'):
             try:
@@ -62,7 +57,7 @@ class ProfilePage(LoginRequiredMixin, View):
                 return redirect(reverse('profile_page'))
             except:
                 messages.error(request, 'A problem has occurred')
-                return redirect(reverse('profile_page'))
+                return redirect(reverse('customer:profile_page'))
 
         context = {
             'user_form': BasicUserForm(instance=request.user),
@@ -76,7 +71,55 @@ class PaymentMethodView(LoginRequiredMixin, View):
     login_url = '/sign-in/?next=/customer/'
 
     def get(self, request):
+        current_customer = request.user.customer
+        if not current_customer.stripe_customer_id:
+            customer = stripe.Customer.create()
+            current_customer.stripe_customer_id = customer.get('id', '')
+            current_customer.save()
+
+        stripe_payment_methods = stripe.Customer.list_payment_methods(
+            current_customer.stripe_customer_id,
+            type='card',
+        )
+        if stripe_payment_methods and stripe_payment_methods.data:
+            current_customer.stripe_payment_method_id = stripe_payment_methods.data[0].id
+            current_customer.stripe_card_last4 = stripe_payment_methods.data[0].card.last4
+            current_customer.save()
+        else:
+            current_customer.stripe_payment_method_id = ''
+            current_customer.stripe_card_last4 = ''
+            current_customer.save()
+
+        if not current_customer.stripe_payment_method_id:
+            intent = stripe.SetupIntent.create(
+                customer=current_customer.stripe_customer_id,
+                payment_method_types=['card'],
+            )
+
+            context = {
+                'client_secret': intent.client_secret,
+                'STRIPE_API_PUBLIC_KEY': settings.STRIPE_API_PUBLIC_KEY,
+            }
+            return render(request, 'customers/payment_method.html', context)
         return render(request, 'customers/payment_method.html')
 
     def post(self, request):
-        return redirect(reverse('profile_page'))
+        current_customer = request.user.customer
+        stripe.PaymentMethod.detach(current_customer.stripe_payment_method_id)
+        current_customer.stripe_card_last4 = ''
+        current_customer.stripe_payment_method_id = ''
+        current_customer.save()
+        messages.success(request, 'Your payment method has been removed.')
+        return redirect(reverse('customer:payment_method'))
+
+
+class CreateJobView(LoginRequiredMixin, View):
+    login_url = '/sign-in/?next=/customer/'
+
+    def get(self, request):
+        if not request.user.customer.stripe_payment_method_id:
+            return redirect(reverse('customer:payment_method'))
+        return render(request, 'customers/create_job.html')
+
+    def post(self, request):
+        return render(request, 'customers/create_job.html')

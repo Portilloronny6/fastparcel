@@ -14,8 +14,8 @@ urlpatterns = [
     path('sign-out/', auth_views.LogoutView.as_view(next_page='/'), name='sign_out'),
     path('sign-up/', SignUpView.as_view(), name='sign_up'),
 
-    path('customer/', include('shipping.customers.urls')),
-    path('courier/', include('shipping.couriers.urls')),
+    path('customer/', include('shipping.customers.urls'), name='customer'),
+    path('courier/', include('shipping.couriers.urls'), name='courier'),
 ]
 
 if settings.DEBUG:
