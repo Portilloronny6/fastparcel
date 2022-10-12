@@ -7,11 +7,30 @@
 {% endblock %}
 
 {% block title %}
-  {{ user.get_full_name|title }}
+  Profile {{ user.username }}
 {% endblock %}
 
 {% block main %}
-  <hr>
+
+  {% if not user.customer.phone_number %}
+    <div class="alert alert-danger alert-dismissible fade show">
+      <h4 class="alert-heading"><i class="fa-solid fa-triangle-exclamation"></i> Please add your phone number</h4>
+      <p class="mb-0">You can add your phone number in your profile.</p>
+      <button class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endif %}
+
+  {% if not user.customer.stripe_payment_method_id %}
+    <div class="alert alert-danger alert-dismissible fade show">
+      <h4 class="alert-heading"><i class="fa-solid fa-triangle-exclamation"></i> Please add your payment method</h4>
+      <p class="mb-0">You can add your phone number in your profile.</p>
+      <button class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  {% endif %}
   {#  Basic Information #}
   <b class="text-secondary">Basic Information</b>
   <div class="card bg-white mt-2 mb-5">
@@ -44,7 +63,6 @@
   <div class="card bg-white mt-2 mb-5">
     <div class="card-body">
 
-
       <div id="get-code" class="input-group mb-3 {% if user.customer.phone_number %} d-none {% endif %}">
         <input type="text" class="form-control" placeholder="+56123456789">
         <div class="input-group-append">
@@ -72,7 +90,6 @@
 
     </div>
   </div>
-
 
   <script src="{% static 'js/phone-auth.js' %}" type="module"></script>
 

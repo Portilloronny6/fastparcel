@@ -1,0 +1,12 @@
+#pills-tab a {
+    color: black;
+}
+
+#pills-tab a:hover {
+    color: #ff7a00;
+    text-decoration: none;
+}
+
+#pills-tab a.active {
+    color: #ff7a00;
+}

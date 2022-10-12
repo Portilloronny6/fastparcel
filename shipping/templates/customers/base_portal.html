@@ -24,21 +24,22 @@
         <ul class="list-group">
           <a href="{% url 'customer:profile_page' %}"
              class="list-group-item list-group-item-action {% if request.path == profile_url %}list-group-item-warning{% endif %}">
-            Profile Information
+            {% if request.path == profile_url %}<i class="fa fa-arrow-right"></i>{% endif %} Profile Information
           </a>
           <a href="{% url 'customer:payment_method' %}"
              class="list-group-item list-group-item-action {% if request.path == payment_url %}list-group-item-warning{% endif %}">
-            Payment Details
+            {% if request.path == payment_url %}<i class="fa fa-arrow-right"></i>{% endif %} Payment Details
           </a>
           <a href="{% url 'customer:create_job' %}"
              class="list-group-item list-group-item-action {% if request.path == create_job_url %}list-group-item-warning{% endif %}">
-            Create a Job
+            {% if request.path == create_job_url %}<i class="fa fa-arrow-right"></i>{% endif %} Create a Job
           </a>
           <a href="{% url 'customer:create_job' %}"
              class="list-group-item list-group-item-action {% if request.path == create_job_url %}list-group-item-warning{% endif %}">
-            My Jobs
+            {% if request.path == create_job_url %}<i class="fa fa-arrow-right"></i>{% endif %} My Jobs
           </a>
         </ul>
+        <hr>
       </div>
       <div class="col-lg-8">
         {% block main %}

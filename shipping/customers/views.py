@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.views import View
 from firebase_admin import credentials, auth
 
-from shipping.forms import BasicUserForm, BasicCustomerForm, CustomPasswordResetForm
+from shipping.forms import BasicUserForm, BasicCustomerForm, CustomPasswordResetForm, JobStep1Form
 
 cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS)
 firebase_admin.initialize_app(cred)
@@ -54,7 +54,8 @@ class ProfilePage(LoginRequiredMixin, View):
                 firebase_user = auth.verify_id_token(request.POST.get('id_token', ''))
                 request.user.customer.phone_number = firebase_user.get('phone_number', '')
                 request.user.customer.save()
-                return redirect(reverse('profile_page'))
+                messages.success(request, 'Your phone number has been approved.')
+                return redirect(reverse('customer:profile_page'))
             except:
                 messages.error(request, 'A problem has occurred')
                 return redirect(reverse('customer:profile_page'))
@@ -119,7 +120,16 @@ class CreateJobView(LoginRequiredMixin, View):
     def get(self, request):
         if not request.user.customer.stripe_payment_method_id:
             return redirect(reverse('customer:payment_method'))
-        return render(request, 'customers/create_job.html')
+
+        if not request.user.customer.phone_number:
+            messages.warning(request, 'Please verify your phone number.')
+            return redirect(reverse('customer:profile_page'))
+
+        step1_form = JobStep1Form()
+        context = {
+            'step1_form': step1_form,
+        }
+        return render(request, 'customers/create_job.html', context)
 
     def post(self, request):
         return render(request, 'customers/create_job.html')

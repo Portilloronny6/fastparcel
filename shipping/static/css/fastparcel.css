@@ -1,0 +1,8 @@
+.bg-warning, .btn-warning, .list-group-item-warning {
+    background-color: #ff7a00 !important;
+}
+
+.text-warning {
+    color: #ff7a00 !important;
+}
+

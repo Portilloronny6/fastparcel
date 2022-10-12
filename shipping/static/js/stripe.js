@@ -25,7 +25,7 @@ form.addEventListener('submit', async (event) => {
         'Agregando!', 'success',
         {
             'showConfirmButton': false,
-            'timer': 3500,
+            'timer': 1500,
             'position': 'top-end'
         })
     const {error} = await stripe.confirmSetup({

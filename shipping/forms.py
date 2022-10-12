@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib.auth.models import User
 
-from shipping.models import Customer
+from shipping.models import Customer, Job
 
 
 class SignUpForm(UserCreationForm):
@@ -39,3 +39,9 @@ class CustomPasswordResetForm(PasswordChangeForm):
     old_password = forms.CharField(
         widget=forms.PasswordInput(attrs={'autocomplete': 'current-password', 'autofocus': False}),
     )
+
+
+class JobStep1Form(forms.ModelForm):
+    class Meta:
+        model = Job
+        fields = ('name', 'description', 'quantity', 'photo')

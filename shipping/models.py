@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -12,3 +14,28 @@ class Customer(models.Model):
 
     def __str__(self):
         return self.user.get_full_name()
+
+
+class Job(models.Model):
+    class Status(models.TextChoices):
+        CREATED = 'created', 'Created'
+        RECEIVED = 'received', 'Received'
+        PROCESSING = 'processing', 'Processing'
+        PICKING = 'picking', 'Picking'
+        DELIVERING = 'delivering', 'Delivering'
+        COMPLETED = 'completed', 'Completed'
+        CANCELLED = 'cancelled', 'Cancelled'
+        POSTPONED = 'postponed', 'Postponed'
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    description = models.CharField(max_length=255)
+    quantity = models.IntegerField(default=1)
+    photo = models.ImageField(upload_to='jobs/photos/%d-%m-%Y/', blank=True, null=True)
+    status = models.CharField(max_length=20, choices=Status.choices, default=Status.CREATED)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name

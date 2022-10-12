@@ -8,7 +8,7 @@ from shipping.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', HomeView.as_view(), name='home'),
+    path('', include('shipping.urls'), name='fastparcel'),
 
     path('sign-in/', auth_views.LoginView.as_view(template_name='sign_in.html'), name='sign_in'),
     path('sign-out/', auth_views.LogoutView.as_view(next_page='/'), name='sign_out'),

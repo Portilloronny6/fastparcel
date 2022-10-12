@@ -12,11 +12,12 @@
   <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+  <link href="{% static 'css/fastparcel.css' %}" rel="stylesheet" type="text/css">
   {% block head %}{% endblock %}
 </head>
 <body>
 <nav class="navbar {% if not user.is_authenticated %}navbar-expand-lg{% endif %}  navbar-light bg-warning">
-  <a class="navbar-brand" href="{% url 'home' %}">FastParcel</a>
+  <a class="navbar-brand" href="{% url 'home' %}">ThePackCo</a>
   {% if not user.is_authenticated %}
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -38,9 +39,9 @@
   {% else %}
     <form class="form-inline">
     <span class="mr-4">
-      {{ user.get_full_name|title }}
+      <i class="fa-solid fa-user"></i> {{ user.get_full_name|title }}
     </span>
-      <a href="/sign-out/" class="btn btn-outline-dark">Sign Out</a>
+      <a href="/sign-out/" class="btn btn-dark">Sign Out</a>
 
     </form>
   {% endif %}
@@ -52,7 +53,10 @@
 {% endblock %}
 
 <footer class="text-center mt-5 mb-5">
-  p © 2022 Fast Parcel. All rights reserved.
+  <p>© Copyright
+    <script>document.write(new Date().getFullYear())</script>
+    ThePackCo. All Rights Reserved.
+  </p>
 </footer>
 
 <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
