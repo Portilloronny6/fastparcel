@@ -79,7 +79,7 @@
       </div>
 
       <div id="change-phone" class="input-group mb-3 {% if not user.customer.phone_number %}d-none{% endif %} ">
-        <input type="text" class="form-control" disabled
+        <input type="text" class="form-control text-success" disabled
                value="{{ user.customer.phone_number }}">
         <div class="input-group-append">
           <button class="btn btn-warning">Change</button>

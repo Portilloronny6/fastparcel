@@ -13,11 +13,17 @@
   <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
   <link href="{% static 'css/fastparcel.css' %}" rel="stylesheet" type="text/css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   {% block head %}{% endblock %}
 </head>
 <body>
 <nav class="navbar {% if not user.is_authenticated %}navbar-expand-lg{% endif %}  navbar-light bg-warning">
-  <a class="navbar-brand" href="{% url 'home' %}">ThePackCo</a>
+  <a class="navbar-brand"
+     href="{% if user.is_authenticated %}{% url 'customer:profile_page' %}{% else %}{% url 'home' %}{% endif %}">
+    ThePackCo
+  </a>
   {% if not user.is_authenticated %}
 
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"

@@ -10,6 +10,7 @@ from django.views import View
 from firebase_admin import credentials, auth
 
 from shipping.forms import BasicUserForm, BasicCustomerForm, CustomPasswordResetForm, JobStep1Form
+from shipping.models import Job
 
 cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS)
 firebase_admin.initialize_app(cred)
@@ -118,18 +119,40 @@ class CreateJobView(LoginRequiredMixin, View):
     login_url = '/sign-in/?next=/customer/'
 
     def get(self, request):
-        if not request.user.customer.stripe_payment_method_id:
+        current_customer = request.user.customer
+        if not current_customer.stripe_payment_method_id:
             return redirect(reverse('customer:payment_method'))
 
-        if not request.user.customer.phone_number:
+        if not current_customer.phone_number:
             messages.warning(request, 'Please verify your phone number.')
             return redirect(reverse('customer:profile_page'))
 
-        step1_form = JobStep1Form()
+        created_job = Job.objects.filter(customer=current_customer, status=Job.Status.CREATED).last()
+        created_form = JobStep1Form(instance=created_job)
+
+        # Determine which step we are
+        if not created_job:
+            current_step = Job.Status.CREATED
+        else:
+            current_step = Job.Status.PICKING
+
         context = {
-            'step1_form': step1_form,
+            'created_form': created_form,
+            'job': created_job,
+            'steps': Job.Status,
+            'current_step': current_step
         }
         return render(request, 'customers/create_job.html', context)
 
     def post(self, request):
+        current_customer = request.user.customer
+        if request.POST.get('step') == Job.Status.CREATED:
+            job = Job.objects.filter(customer=current_customer, status=Job.Status.CREATED).last()
+            created_form = JobStep1Form(request.POST, request.FILES, instance=job)
+
+            if created_form.is_valid():
+                creating_job = created_form.save(commit=False)
+                creating_job.customer = current_customer
+                creating_job.save()
+                return redirect(reverse('customer:create_job'))
         return render(request, 'customers/create_job.html')

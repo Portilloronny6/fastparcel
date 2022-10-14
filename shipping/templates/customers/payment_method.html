@@ -27,7 +27,8 @@
       {% if user.customer.stripe_payment_method_id %}
 
         <div class="input-group" id="change-card">
-          <input type="text" class="form-control" disabled value="**** **** **** {{ user.customer.stripe_card_last4 }}">
+          <input type="text" class="form-control text-success" disabled
+                 value="**** **** **** {{ user.customer.stripe_card_last4 }}">
           <div class="input-group-append">
             <form method="post">
               {% csrf_token %}
