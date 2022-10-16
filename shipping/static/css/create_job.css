@@ -10,3 +10,11 @@
 #pills-tab a.active {
     color: #ff7a00;
 }
+
+#pickup-map {
+    height: 100%;
+}
+
+h4 {
+    font-weight: 500 !important;
+}

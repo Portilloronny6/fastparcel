@@ -9,7 +9,8 @@ from django.urls import reverse
 from django.views import View
 from firebase_admin import credentials, auth
 
-from shipping.forms import BasicUserForm, BasicCustomerForm, CustomPasswordResetForm, JobStep1Form
+from shipping.forms import BasicUserForm, BasicCustomerForm, \
+    CustomPasswordResetForm, JobCreateForm, JobPickUpForm
 from shipping.models import Job
 
 cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS)
@@ -127,32 +128,43 @@ class CreateJobView(LoginRequiredMixin, View):
             messages.warning(request, 'Please verify your phone number.')
             return redirect(reverse('customer:profile_page'))
 
-        created_job = Job.objects.filter(customer=current_customer, status=Job.Status.CREATED).last()
-        created_form = JobStep1Form(instance=created_job)
+        job = Job.objects.filter(customer=current_customer, status=Job.Status.CREATED).last()
+        created_form = JobCreateForm(instance=job)
+        pickup_form = JobPickUpForm(instance=job)
 
         # Determine which step we are
-        if not created_job:
+        if not job:
             current_step = Job.Status.CREATED
+        elif job.pickup_name:
+            current_step = Job.Status.DELIVERING
         else:
             current_step = Job.Status.PICKING
 
         context = {
             'created_form': created_form,
-            'job': created_job,
+            'pickup_form': pickup_form,
+            'job': job,
             'steps': Job.Status,
-            'current_step': current_step
+            'current_step': current_step,
+            'GOOGLE_MAPS_CREDENTIAL': settings.GOOGLE_MAPS_CREDENTIAL,
         }
         return render(request, 'customers/create_job.html', context)
 
     def post(self, request):
         current_customer = request.user.customer
+        job = Job.objects.filter(customer=current_customer, status=Job.Status.CREATED).last()
         if request.POST.get('step') == Job.Status.CREATED:
-            job = Job.objects.filter(customer=current_customer, status=Job.Status.CREATED).last()
-            created_form = JobStep1Form(request.POST, request.FILES, instance=job)
+            created_form = JobCreateForm(request.POST, request.FILES, instance=job)
 
             if created_form.is_valid():
                 creating_job = created_form.save(commit=False)
                 creating_job.customer = current_customer
                 creating_job.save()
+                return redirect(reverse('customer:create_job'))
+
+        elif request.POST.get('step') == Job.Status.PICKING:
+            pickup_form = JobPickUpForm(request.POST, instance=job)
+            if pickup_form.is_valid():
+                pickup_form.save()
                 return redirect(reverse('customer:create_job'))
         return render(request, 'customers/create_job.html')

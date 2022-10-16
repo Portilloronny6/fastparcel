@@ -37,5 +37,11 @@ class Job(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    pickup_address = models.CharField(max_length=255, blank=True)
+    pickup_lat = models.FloatField(default=0.0)
+    pickup_lng = models.FloatField(default=0.0)
+    pickup_name = models.CharField(max_length=255, blank=True)
+    pickup_phone = models.CharField(max_length=255, blank=True)
+
     def __str__(self):
         return self.name

@@ -41,7 +41,16 @@ class CustomPasswordResetForm(PasswordChangeForm):
     )
 
 
-class JobStep1Form(forms.ModelForm):
+class JobCreateForm(forms.ModelForm):
     class Meta:
         model = Job
         fields = ('name', 'description', 'quantity', 'photo')
+
+
+class JobPickUpForm(forms.ModelForm):
+    pickup_lat = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    pickup_lng = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+
+    class Meta:
+        model = Job
+        fields = ('pickup_address', 'pickup_lat', 'pickup_lng', 'pickup_name', 'pickup_phone')

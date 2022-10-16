@@ -3,6 +3,10 @@
 {% load bootstrap4 %}
 
 {% block head %}
+  <script async
+          src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_CREDENTIAL }}&libraries=places&callback=initMap">
+  </script>
+
   <link rel="stylesheet" href="{% static 'css/create_job.css' %}">
 {% endblock %}
 
@@ -19,9 +23,19 @@
             {% if not job %}
               <p>A summary of your job information will appear here</p>
             {% else %}
+
               <h4>{{ job.name }}</h4>
               <span>{{ job.quantity }} Item</span><br>
               <span>{{ job.description }}</span><br>
+            {% endif %}
+
+            {% if current_step == job.Status.DELIVERING %}
+              <hr>
+              <p class="text-secondary">
+                <small><b>PICKUP</b></small>
+              </p>
+              <h4>{{ job.pickup_name }}</h4>
+              <span>{{ job.pickup_address }}</span><br>
             {% endif %}
           </div>
         </div>
@@ -89,6 +103,7 @@
         <b>CREATE A JOB</b>
         <hr>
         <div class="tab-content" id="pills-tabContent">
+          {# Info #}
           <div class="tab-pane fade {% if current_step == steps.CREATED %}show active{% endif %}"
                id="pills-info" role="tabpanel" aria-labelledby="pills-info-tab">
             <h1>Оrder Info</h1>
@@ -105,17 +120,46 @@
               </div>
             </form>
           </div>
-
+          {# PickUp #}
           <div class="tab-pane fade {% if current_step == steps.PICKING %}show active{% endif %}" id="pills-pickup"
                role="tabpanel" aria-labelledby="pills-pickup-tab">
             <h1>Pickup</h1>
+            <form method="post" enctype="multipart/form-data">
+              <b class="text-secondary">Pickup Information</b>
+              <div class="card bg-white mt-2 mb-5">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-lg-6">
+                      {% csrf_token %}
+                      {% bootstrap_form pickup_form %}
+                      <input type="hidden" id="pickup-lat" name="pickup_lat" value="{{ job.pickup_lat }}">
+                      <input type="hidden" id="pickup-lng" name="pickup_lng" value="{{ job.pickup_lng }}">
+                    </div>
+                    <div class="col-lg-6">
+                      <div id="pickup-map">
+                        <div id="infowindow-content">
+                          <img src="" width="16" height="16" id="place-icon">
+                          <span id="place-name" class="title"></span><br>
+                          <span id="place-address"></span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="hidden" name="step" value="picking">
+                  <button type="button" class="btn btn-outline-warning" onclick="$('#pills-info-tab').tab('show');">
+                    Back
+                  </button>
+                  <button type="submit" class="btn btn-warning">Save & Continue</button>
+                </div>
+              </div>
+            </form>
           </div>
-
+          {# Delivery #}
           <div class="tab-pane fade {% if current_step == steps.DELIVERING %}show active{% endif %}" id="pills-delivery"
                role="tabpanel" aria-labelledby="pills-delivery-tab">
             <h1>Delivery</h1>
           </div>
-
+          {# Payment #}
           <div class="tab-pane fade {% if current_step == steps.COMPLETED %}show active{% endif %}" id="pills-payment"
                role="tabpanel" aria-labelledby="pills-payment-tab">
             <h1>Pago</h1>
@@ -124,4 +168,9 @@
       </div>
     </div>
   </div>
+  <script>
+      const latitude = parseFloat({{ job.pickup_lat }})
+      const longitude = parseFloat({{ job.pickup_lng }})
+  </script>
+  <script src="{% static 'js/jobs.js' %}"></script>
 {% endblock %}

@@ -22,7 +22,7 @@
 <nav class="navbar {% if not user.is_authenticated %}navbar-expand-lg{% endif %}  navbar-light bg-warning">
   <a class="navbar-brand"
      href="{% if user.is_authenticated %}{% url 'customer:profile_page' %}{% else %}{% url 'home' %}{% endif %}">
-    ThePackCo
+    <img src="{% static 'img/logo.png' %}" height="48" data-sticky-height="40">
   </a>
   {% if not user.is_authenticated %}
 
@@ -44,7 +44,7 @@
     </div>
   {% else %}
     <form class="form-inline">
-    <span class="mr-4">
+    <span class="mr-4" id="user-fullname">
       <i class="fa-solid fa-user"></i> {{ user.get_full_name|title }}
     </span>
       <a href="/sign-out/" class="btn btn-dark">Sign Out</a>
