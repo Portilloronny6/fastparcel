@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -143,4 +143,4 @@ STRIPE_API_SECRET_KEY = 'sk_test_51LqzbFAoF7K2KEW3KD2ZxMpU5Jxb8MK3yGSDFtUkWpPv4A
 
 # Google Maps API
 
-GOOGLE_MAPS_CREDENTIAL = 'AIzaSyCScaYd7T4mYQ_hvzRPWCh8Oc-bE9hg1AA'
+GOOGLE_MAPS_CREDENTIAL = os.environ.get('GOOGLE_MAPS_API')
