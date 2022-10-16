@@ -48,9 +48,24 @@ class JobCreateForm(forms.ModelForm):
 
 
 class JobPickUpForm(forms.ModelForm):
+    pickup_address = forms.CharField(required=True)
+    pickup_name = forms.CharField(required=True)
+    pickup_phone = forms.CharField(required=True)
     pickup_lat = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
     pickup_lng = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
 
     class Meta:
         model = Job
         fields = ('pickup_address', 'pickup_lat', 'pickup_lng', 'pickup_name', 'pickup_phone')
+
+
+class JobDeliveryForm(forms.ModelForm):
+    delivery_address = forms.CharField(required=True)
+    delivery_name = forms.CharField(required=True)
+    delivery_phone = forms.CharField(required=True)
+    delivery_lat = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+    delivery_lng = forms.CharField(widget=forms.TextInput(attrs={'readonly': 'readonly'}))
+
+    class Meta:
+        model = Job
+        fields = ('delivery_address', 'delivery_lat', 'delivery_lng', 'delivery_name', 'delivery_phone')

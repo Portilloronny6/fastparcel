@@ -1,5 +1,5 @@
-function initMap() {
-    const map = new google.maps.Map(document.getElementById("pickup-map"), {
+function initMapByType(type, latitude, longitude) {
+    const map = new google.maps.Map(document.getElementById(type + "-map"), {
         center: {lat: latitude || -33.3982643, lng: longitude || -70.7725975},
         zoom: 15,
     });
@@ -13,13 +13,13 @@ function initMap() {
         east: center.lng + 0.1,
         west: center.lng - 0.1,
     };
-    const input = document.getElementById("id_pickup_address");
+    const input = document.getElementById("id_" + type + "_address");
     const options = {
         bounds: defaultBounds,
         componentRestrictions: {country: "cl"},
         fields: ["address_components", "geometry", "icon", "name"],
         strictBounds: false,
-        types: ["establishment"],
+        types: ["address"],
     };
     const autocomplete = new google.maps.places.Autocomplete(input, options);
 
@@ -40,7 +40,7 @@ function initMap() {
 
     // [END maps_places_autocomplete_setbounds]
     const infowindow = new google.maps.InfoWindow();
-    const infowindowContent = document.getElementById("infowindow-content");
+    const infowindowContent = document.getElementById(type + "-infowindow-content");
 
     infowindow.setContent(infowindowContent);
 
@@ -54,8 +54,8 @@ function initMap() {
         marker.setVisible(false);
 
         const place = autocomplete.getPlace();
-        document.querySelector("#pickup-lat").value = place.geometry.location.lat();
-        document.querySelector("#pickup-lng").value = place.geometry.location.lng();
+        document.querySelector("#" + type + "-lat").value = place.geometry.location.lat();
+        document.querySelector("#" + type + "-lng").value = place.geometry.location.lng();
 
         if (!place.geometry || !place.geometry.location) {
             // User entered the name of a Place that was not suggested and
@@ -91,11 +91,16 @@ function initMap() {
             ].join(" ");
         }
 
-        infowindowContent.children["place-icon"].src = place.icon;
-        infowindowContent.children["place-name"].textContent = place.name;
-        infowindowContent.children["place-address"].textContent = address;
+        infowindowContent.children[type + "-place-icon"].src = place.icon;
+        infowindowContent.children[type + "-place-name"].textContent = place.name;
+        infowindowContent.children[type + "-place-address"].textContent = address;
         infowindow.open(map, marker);
     });
+}
+
+function initMap() {
+    initMapByType("pickup", pickupLat, pickupLng);
+    initMapByType("delivery", deliveryLat, deliveryLng);
 }
 
 window.initMap = initMap;

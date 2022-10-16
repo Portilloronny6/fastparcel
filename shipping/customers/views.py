@@ -1,4 +1,5 @@
 import firebase_admin
+import requests
 import stripe
 from django.conf import settings
 from django.contrib import messages
@@ -10,7 +11,7 @@ from django.views import View
 from firebase_admin import credentials, auth
 
 from shipping.forms import BasicUserForm, BasicCustomerForm, \
-    CustomPasswordResetForm, JobCreateForm, JobPickUpForm
+    CustomPasswordResetForm, JobCreateForm, JobPickUpForm, JobDeliveryForm
 from shipping.models import Job
 
 cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS)
@@ -131,20 +132,24 @@ class CreateJobView(LoginRequiredMixin, View):
         job = Job.objects.filter(customer=current_customer, status=Job.Status.CREATED).last()
         created_form = JobCreateForm(instance=job)
         pickup_form = JobPickUpForm(instance=job)
+        delivery_form = JobDeliveryForm(instance=job)
 
         # Determine which step we are
         if not job:
-            current_step = Job.Status.CREATED
+            current_step = Job.Steps.CREATED
+        elif job.delivery_name:
+            current_step = Job.Steps.COMPLETED
         elif job.pickup_name:
-            current_step = Job.Status.DELIVERING
+            current_step = Job.Steps.DELIVERY
         else:
-            current_step = Job.Status.PICKING
+            current_step = Job.Steps.PICKUP
 
         context = {
             'created_form': created_form,
             'pickup_form': pickup_form,
+            'delivery_form': delivery_form,
             'job': job,
-            'steps': Job.Status,
+            'steps': Job.Steps,
             'current_step': current_step,
             'GOOGLE_MAPS_CREDENTIAL': settings.GOOGLE_MAPS_CREDENTIAL,
         }
@@ -167,4 +172,27 @@ class CreateJobView(LoginRequiredMixin, View):
             if pickup_form.is_valid():
                 pickup_form.save()
                 return redirect(reverse('customer:create_job'))
+
+        elif request.POST.get('step') == Job.Status.DELIVERING:
+            delivery_form = JobDeliveryForm(request.POST, instance=job)
+            if delivery_form.is_valid():
+                try:
+                    response = requests.get(
+                        "https://maps.googleapis.com/maps/api/distancematrix/json?&origins={},{}&destinations={},{}&key={}".format(
+                            job.pickup_lat,
+                            job.pickup_lng,
+                            job.delivery_lat,
+                            job.delivery_lng,
+                            settings.GOOGLE_MAPS_CREDENTIAL,
+                        ))
+                    if response.json().get('status', '') == 'OK':
+                        r = response.json()
+                        job.distance = round(r.get('rows')[0].get('elements')[0].get('distance').get('value') / 1000, 2)
+                        job.duration = int(r.get('rows')[0].get('elements')[0].get('duration').get('value') / 60)
+                        job.price = round(job.distance * 0.8, 2)  # $0.8 per km
+                        job.save()
+                        delivery_form.save()
+                        return redirect(reverse('customer:create_job'))
+                except Exception as error:
+                    messages.error(request, 'Unfortunately, we do not support shipping to this address.')
         return render(request, 'customers/create_job.html')

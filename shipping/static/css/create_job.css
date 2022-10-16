@@ -11,7 +11,7 @@
     color: #ff7a00;
 }
 
-#pickup-map {
+#pickup-map, #delivery-map {
     height: 100%;
 }
 
