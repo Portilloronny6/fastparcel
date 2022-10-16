@@ -23,7 +23,7 @@
             {% if not job %}
               <p>A summary of your job information will appear here</p>
             {% else %}
-              <h4>{{ job.name }}</h4>
+              <h4>{{ job.name|title }}</h4>
               <span>{{ job.quantity }} Item</span><br>
               <span>{{ job.description }}</span><br>
             {% endif %}
@@ -33,7 +33,7 @@
               <p class="text-secondary">
                 <small><b>PICKUP</b></small>
               </p>
-              <h4>{{ job.pickup_name }}</h4>
+              <h4>{{ job.pickup_name|title }}</h4>
               <span>{{ job.pickup_address }}</span><br>
             {% endif %}
 
@@ -42,7 +42,7 @@
               <p class="text-secondary">
                 <small><b>DELIVERY</b></small>
               </p>
-              <h4>{{ job.delivery_name }}</h4>
+              <h4>{{ job.delivery_name|title }}</h4>
               <span>{{ job.delivery_address }}</span><br>
             {% endif %}
           </div>
@@ -199,7 +199,29 @@
           {# Payment #}
           <div class="tab-pane fade {% if current_step == steps.COMPLETED %}show active{% endif %}" id="pills-payment"
                role="tabpanel" aria-labelledby="pills-payment-tab">
-            <h1>Pago</h1>
+            <h1>Payment</h1>
+            <form method="post">
+              <b class="text-secondary">Payment Method</b>
+              <div class="card bg-white mt-2 mb-5">
+                <div class="card-body">
+                  {% csrf_token %}
+                  <div class="form-group">
+                    <label>Your Credit/Debit Card</label>
+                    <input class="form-control" value="**** **** **** {{ user.customer.stripe_card_last4 }}" disabled>
+                  </div>
+                  <div class="form-group">
+                    <label>Price</label>
+                    <input class="form-control" value="{% if not job.price %}$0.00{% else %}${{ job.price }}{% endif %}"
+                           disabled>
+                  </div>
+                </div>
+                <input type="hidden" name="step" value="completed">
+              </div>
+              <button type="button" class="btn btn-outline-warning" onclick="$('#pills-delivery-tab').tab('show');">
+                Back
+              </button>
+              <button type="submit" class="btn btn-warning">Create Job</button>
+            </form>
           </div>
         </div>
       </div>

@@ -12,7 +12,7 @@ from firebase_admin import credentials, auth
 
 from shipping.forms import BasicUserForm, BasicCustomerForm, \
     CustomPasswordResetForm, JobCreateForm, JobPickUpForm, JobDeliveryForm
-from shipping.models import Job
+from shipping.models import Job, Transaction
 
 cred = credentials.Certificate(settings.FIREBASE_CREDENTIALS)
 firebase_admin.initialize_app(cred)
@@ -169,30 +169,67 @@ class CreateJobView(LoginRequiredMixin, View):
 
         elif request.POST.get('step') == Job.Status.PICKING:
             pickup_form = JobPickUpForm(request.POST, instance=job)
-            if pickup_form.is_valid():
-                pickup_form.save()
+            if not pickup_form.is_valid() or not job:
+                messages.error(request, 'Previous step is not completed.')
                 return redirect(reverse('customer:create_job'))
+            pickup_form.save()
+            return redirect(reverse('customer:create_job'))
 
         elif request.POST.get('step') == Job.Status.DELIVERING:
             delivery_form = JobDeliveryForm(request.POST, instance=job)
-            if delivery_form.is_valid():
-                try:
-                    response = requests.get(
-                        "https://maps.googleapis.com/maps/api/distancematrix/json?&origins={},{}&destinations={},{}&key={}".format(
-                            job.pickup_lat,
-                            job.pickup_lng,
-                            job.delivery_lat,
-                            job.delivery_lng,
-                            settings.GOOGLE_MAPS_CREDENTIAL,
-                        ))
-                    if response.json().get('status', '') == 'OK':
-                        r = response.json()
-                        job.distance = round(r.get('rows')[0].get('elements')[0].get('distance').get('value') / 1000, 2)
-                        job.duration = int(r.get('rows')[0].get('elements')[0].get('duration').get('value') / 60)
-                        job.price = round(job.distance * 0.8, 2)  # $0.8 per km
-                        job.save()
-                        delivery_form.save()
-                        return redirect(reverse('customer:create_job'))
-                except Exception as error:
-                    messages.error(request, 'Unfortunately, we do not support shipping to this address.')
-        return render(request, 'customers/create_job.html')
+            if not delivery_form.is_valid() or not job or not job.pickup_name:
+                messages.error(request, 'Previous step is not completed.')
+                return redirect(reverse('customer:create_job'))
+
+            try:
+                response = requests.get(
+                    "https://maps.googleapis.com/maps/api/distancematrix/json?&origins={},{}&destinations={},{}&key={}".format(
+                        job.pickup_lat,
+                        job.pickup_lng,
+                        job.delivery_lat,
+                        job.delivery_lng,
+                        settings.GOOGLE_MAPS_CREDENTIAL,
+                    ))
+                if response.json().get('status', '') == 'OK':
+                    r = response.json()
+                    job.distance = round(r.get('rows')[0].get('elements')[0].get('distance').get('value') / 1000, 2)
+                    job.duration = int(r.get('rows')[0].get('elements')[0].get('duration').get('value') / 60)
+                    job.price = round(job.distance * 0.8, 2)  # $0.8 per km
+                    job.save()
+                    delivery_form.save()
+                    return redirect(reverse('customer:create_job'))
+            except Exception:
+                messages.error(request, 'Unfortunately, we do not support shipping to this address.')
+                return redirect(reverse('customer:create_job'))
+
+        elif request.POST.get('step') == Job.Status.COMPLETED:
+            if not job or not job.pickup_name or not job.delivery_name:
+                messages.error(request, 'Previous step is not completed.')
+                return redirect(reverse('customer:create_job'))
+            try:
+                payment_intent = stripe.PaymentIntent.create(
+                    amount=int(job.price * 100),
+                    currency='usd',
+                    customer=request.user.customer.stripe_customer_id,
+                    payment_method=request.user.customer.stripe_payment_method_id,
+                    off_session=True,
+                    confirm=True,
+                )
+                Transaction.objects.create(
+                    stripe_payment_intent_id=payment_intent.get('id'),
+                    job=job,
+                    amount=job.price,
+                )
+                job.status = Job.Status.PROCESSING
+                job.save()
+
+                messages.success(request, 'Your payment has been processed successfully.')
+                return redirect(reverse('customer:profile_page'))
+            except stripe.error.CardError as e:
+                err = e.error
+                # Error code will be authentication_required if authentication is needed
+                print("Code is: %s" % err.code)
+                payment_intent_id = err.payment_intent['id']
+                payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
+                messages.error(request, 'Your card was declined.')
+                return redirect(reverse('customer:profile_page'))

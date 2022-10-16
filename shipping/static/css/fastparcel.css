@@ -10,6 +10,17 @@ body {
     font-family: 'Roboto', sans-serif;
 }
 
+.btn-outline-warning {
+    color: #ff7a00;
+    border-color: #ff7a00;
+}
+
+.btn-outline-warning:hover {
+    /*Black color*/
+    color: #000000;
+    background-color: #ff7a00 !important;
+}
+
 @media screen and (max-width: 900px) {
     #user-fullname {
         display: none;
