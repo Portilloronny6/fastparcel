@@ -132,7 +132,7 @@ LOGOUT_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'Fast Parcel <no-reply@fastparcel.localhost>'
 
-# Firease
+# Firebase
 
 FIREBASE_CREDENTIALS = BASE_DIR / 'fastparcel-970e6-firebase-adminsdk-7n8z4-91bf602120.json'
 

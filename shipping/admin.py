@@ -5,7 +5,7 @@ from shipping.models import Customer, Job, Transaction
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    raw_id_fields = ('user',)
+    pass
 
 
 @admin.register(Job)

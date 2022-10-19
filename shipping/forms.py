@@ -42,6 +42,8 @@ class CustomPasswordResetForm(PasswordChangeForm):
 
 
 class JobCreateForm(forms.ModelForm):
+    photo = forms.ImageField(required=True)
+
     class Meta:
         model = Job
         fields = ('name', 'description', 'quantity', 'photo')

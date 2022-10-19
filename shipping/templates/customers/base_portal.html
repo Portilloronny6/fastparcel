@@ -8,6 +8,8 @@
 {% block content %}
   {% url 'customer:profile_page' as profile_url %}
   {% url 'customer:payment_method' as payment_url %}
+  {% url 'customer:current_job' as current_job_url %}
+  {% url 'customer:archived_job' as archive_job_url %}
   {% url 'customer:create_job' as create_job_url %}
 
   <div class="container bg-light mt-4 pt-3 pb-3">
@@ -30,13 +32,14 @@
              class="list-group-item list-group-item-action {% if request.path == payment_url %}list-group-item-warning{% endif %}">
             {% if request.path == payment_url %}<i class="fa fa-arrow-right"></i>{% endif %} Payment Details
           </a>
-          <a href="{% url 'customer:create_job' %}"
-             class="list-group-item list-group-item-action {% if request.path == create_job_url %}list-group-item-warning{% endif %}">
-            {% if request.path == create_job_url %}<i class="fa fa-arrow-right"></i>{% endif %} Create a Job
+          <a href="{% url 'customer:current_job' %}"
+             class="list-group-item list-group-item-action {% if request.path == current_job_url or request.path == archive_job_url %}list-group-item-warning{% endif %}">
+            {% if request.path == current_job_url or request.path == archive_job_url %}
+              <i class="fa fa-arrow-right"></i>{% endif %} My Jobs
           </a>
           <a href="{% url 'customer:create_job' %}"
              class="list-group-item list-group-item-action {% if request.path == create_job_url %}list-group-item-warning{% endif %}">
-            {% if request.path == create_job_url %}<i class="fa fa-arrow-right"></i>{% endif %} My Jobs
+            {% if request.path == create_job_url %}<i class="fa fa-arrow-right"></i>{% endif %} Create a Job
           </a>
         </ul>
         <hr>

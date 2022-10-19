@@ -1,0 +1,19 @@
+.photo {
+    object-fit: cover;
+}
+
+.photo-blank {
+    border: 2px dashed #DFDFDF;
+    height: 130px;
+    width: 130px;
+    border-radius: 5px;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    padding: 10px;
+}
+
+#map {
+    height: 500px;
+}

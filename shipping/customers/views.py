@@ -5,7 +5,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, redirect
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.http import Http404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.views import View
 from firebase_admin import credentials, auth
@@ -129,6 +131,19 @@ class CreateJobView(LoginRequiredMixin, View):
             messages.warning(request, 'Please verify your phone number.')
             return redirect(reverse('customer:profile_page'))
 
+        has_current_job = Job.objects.filter(
+            customer=request.user.customer,
+            status__in=[
+                Job.Status.PICKING,
+                Job.Status.DELIVERING,
+                Job.Status.PROCESSING
+            ]
+        ).exists()
+
+        if has_current_job:
+            messages.warning(request, 'You currently have a proccessing job ⚒.')
+            return redirect(reverse('customer:current_job'))
+
         job = Job.objects.filter(customer=current_customer, status=Job.Status.CREATED).last()
         created_form = JobCreateForm(instance=job)
         pickup_form = JobPickUpForm(instance=job)
@@ -224,7 +239,7 @@ class CreateJobView(LoginRequiredMixin, View):
                 job.save()
 
                 messages.success(request, 'Your payment has been processed successfully.')
-                return redirect(reverse('customer:profile_page'))
+                return redirect(reverse('customer:current_job'))
             except stripe.error.CardError as e:
                 err = e.error
                 # Error code will be authentication_required if authentication is needed
@@ -233,3 +248,60 @@ class CreateJobView(LoginRequiredMixin, View):
                 payment_intent = stripe.PaymentIntent.retrieve(payment_intent_id)
                 messages.error(request, 'Your card was declined.')
                 return redirect(reverse('customer:profile_page'))
+
+
+class CurrentJobView(View):
+
+    def get(self, request):
+        jobs = Job.objects.filter(customer=request.user.customer, status__in=[Job.Status.PROCESSING])
+        context = {
+            'jobs': jobs,
+        }
+        return render(request, 'customers/current_job.html', context)
+
+
+class ArchivedJobView(View):
+
+    def get(self, request):
+        jobs = Job.objects.filter(
+            customer=request.user.customer,
+            status__in=[Job.Status.COMPLETED, Job.Status.CANCELLED]
+        )
+
+        paginator = Paginator(jobs, 2)
+        page_number = request.GET.get('page', 1)
+        try:
+            jobs = paginator.page(page_number)
+        except PageNotAnInteger:
+            jobs = paginator.page(1)
+        except EmptyPage:
+            jobs = paginator.page(paginator.num_pages)
+
+        total_pages = range(1, jobs.paginator.num_pages + 1)
+
+        context = {
+            'arhived_jobs': jobs,
+            'total_pages': total_pages,
+        }
+        return render(request, 'customers/archived_jobs.html', context)
+
+
+class JobDetailView(View):
+
+    def get(self, request, job_id):
+        job = get_object_or_404(Job, pk=job_id)
+
+        context = {
+            'job': job,
+            'GOOGLE_MAPS_CREDENTIAL': settings.GOOGLE_MAPS_CREDENTIAL,
+        }
+        return render(request, 'customers/job_detail.html', context)
+
+    def post(self, request, job_id):
+        job = get_object_or_404(Job, pk=job_id)
+        if job.status == Job.Status.PROCESSING:
+            job.status = Job.Status.CANCELLED
+            job.save()
+            messages.success(request, 'Your job has been cancelled.')
+            return redirect(reverse('customer:current_job'))
+        return redirect(reverse('customer:current_job'))

@@ -6,6 +6,8 @@
   <script async
           src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_CREDENTIAL }}&libraries=places&v=weekly&callback=initMap">
   </script>
+  <script src="{% static 'js/create_job.js' %}" defer></script>
+
 
   <link rel="stylesheet" href="{% static 'css/create_job.css' %}">
 {% endblock %}
@@ -46,6 +48,10 @@
               <span>{{ job.delivery_address }}</span><br>
             {% endif %}
           </div>
+        </div>
+        <br>
+        <div>
+          <a href="{% url 'customer:profile_page' %}" class="btn btn-dark">Regresar</a>
         </div>
       </div>
       <!--RIGHT SIDE-->
@@ -233,5 +239,4 @@
       const deliveryLat = parseFloat({{ job.delivery_lat }})
       const deliveryLng = parseFloat({{ job.delivery_lng }})
   </script>
-  <script src="{% static 'js/jobs.js' %}"></script>
 {% endblock %}
