@@ -16,6 +16,15 @@ class Customer(models.Model):
         return self.user.get_full_name()
 
 
+class Courier(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    lat = models.FloatField(default=0.0)
+    lng = models.FloatField(default=0.0)
+
+    def __str__(self):
+        return self.user.get_full_name()
+
+
 class Job(models.Model):
     class Steps:
         CREATED = 1
@@ -36,6 +45,7 @@ class Job(models.Model):
     # Order Info Step
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    courier = models.ForeignKey(Courier, on_delete=models.CASCADE, null=True, blank=True)
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
     quantity = models.IntegerField(default=1)
@@ -75,6 +85,9 @@ class Job(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['created_at']),
+        ]
 
 
 class Transaction(models.Model):

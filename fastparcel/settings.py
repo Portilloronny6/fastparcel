@@ -48,7 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'shipping.middleware.CustomerProfileMiddleware',
+    'shipping.middleware.ProfileMiddleware',
 ]
 
 ROOT_URLCONF = 'fastparcel.urls'

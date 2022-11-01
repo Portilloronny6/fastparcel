@@ -1,7 +1,7 @@
-from shipping.models import Customer
+from shipping.models import Customer, Courier
 
 
-class CustomerProfileMiddleware:
+class ProfileMiddleware:
 
     def __init__(self, get_response):
         self._get_response = get_response
@@ -9,5 +9,10 @@ class CustomerProfileMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated and not hasattr(request.user, 'customer'):
             Customer.objects.create(user=request.user)
+
+        if request.user.is_authenticated and not hasattr(request.user, 'courier'):
+            Courier.objects.create(user=request.user)
+
         response = self._get_response(request)
+
         return response

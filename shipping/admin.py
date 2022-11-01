@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from shipping.models import Customer, Job, Transaction
+from shipping.models import Customer, Job, Transaction, Courier
 
 
 @admin.register(Customer)
@@ -18,3 +18,8 @@ class JobAdmin(admin.ModelAdmin):
 class TransactionAdmin(admin.ModelAdmin):
     raw_id_fields = ('job',)
     list_display = ('stripe_payment_intent_id', 'job', 'amount', 'created_at')
+
+
+@admin.register(Courier)
+class CourierAdmin(admin.ModelAdmin):
+    pass

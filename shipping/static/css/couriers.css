@@ -1,0 +1,44 @@
+body {
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.bottom-tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    display: flex;
+    background-color: white;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.bottom-tabs > a {
+    flex: 1;
+    padding: 5px;
+    color: #BFBFBF;
+    text-decoration: none;
+}
+
+.bottoms-tabs > a > span {
+    font-size: 13px;
+    font-weight: bold;
+    display: block;
+}
+
+.bottom-tabs > a > i {
+    font-size: 20px;
+}
+
+.bottom-tabs > a.active {
+    color: #ff7a00;
+}
+
+#map {
+    flex: 1;
+}
+
+#content{
+    height: calc(var(--vh, 1vh) * 100);
+}

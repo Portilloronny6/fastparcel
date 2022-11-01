@@ -1,0 +1,18 @@
+{% extends 'couriers/base.html' %}
+
+
+{% block head %}
+  <script async
+          src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_CREDENTIAL }}&libraries=places&v=weekly&callback=initMap">
+  </script>
+{% endblock %}
+
+{% block content %}
+  <div class="d-flex flex-column h-100" style="padding-bottom: 60px">
+    <div id="map"></div>
+  </div>
+
+
+  {% include 'couriers/bottom_tabs.html' %}
+
+{% endblock %}
