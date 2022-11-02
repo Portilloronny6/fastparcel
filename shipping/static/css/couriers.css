@@ -39,6 +39,10 @@ body {
     flex: 1;
 }
 
-#content{
+#content {
     height: calc(var(--vh, 1vh) * 100);
+}
+
+.gm-ui-hover-effect {
+    display: none !important;
 }

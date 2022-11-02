@@ -15,4 +15,7 @@
 
   {% include 'couriers/bottom_tabs.html' %}
 
+  <script>
+      const apiUrl = '{% url 'courier:available_jobs_api' %}'
+  </script>
 {% endblock %}
